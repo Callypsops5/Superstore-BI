@@ -100,6 +100,37 @@ class CategoriePerf(BaseModel):
     profit: float
     nb_commandes: int
     marge_pct: float
+    
+    # Marge en pourcentage
+class RentabiliteGlobale(BaseModel):
+    """Modèle pour la rentabilité globale (KPIs de haut niveau)"""
+    marge_globale: float
+    profit_total: float
+    est_sante: bool  # Pour le storytelling : vrai si la marge est bonne
+    message: str     # Le message de storytelling à afficher
+    
+class ProduitPerte(BaseModel):
+    """Modèle pour les produits qui perdent de l'argent"""
+    produit: str
+    categorie: str
+    perte_montant: float
+    
+class ImpactRemise(BaseModel):
+    """Modèle pour l'analyse de l'impact des remises sur le profit"""
+    remise: float
+    profit_moyen: float
+
+class RentabiliteCategorie(BaseModel):
+    """Modèle pour la performance par secteur d'activité"""
+    categorie: str
+    ca: float
+    profit: float
+    marge_pct: float
+
+class TendanceRentabilite(BaseModel):
+    """Modèle pour l'évolution temporelle de la marge"""
+    periode: str
+    marge_pct: float    
 
 # === FONCTIONS UTILITAIRES ===
 
