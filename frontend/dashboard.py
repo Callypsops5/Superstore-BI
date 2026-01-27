@@ -461,6 +461,59 @@ fig_segments.update_layout(
 )
 st.plotly_chart(fig_segments, use_container_width=True)
 
+# === SYNTHÈSE FINALE ===
+st.divider()
+st.header("🧠 Synthèse Finale")
+
+st.write("""
+L’analyse du dataset Superstore met en évidence une situation contrastée : 
+l’entreprise génère un chiffre d’affaires solide, mais sa rentabilité reste fragile. 
+Plusieurs facteurs expliquent cette tension : des remises trop élevées, des produits structurellement non rentables, 
+et des disparités importantes entre les régions et les segments clients.
+
+Les catégories Technology et Office Supplies tirent la performance globale, 
+tandis que Furniture souffre d’une marge faible malgré un volume de ventes important. 
+La région West apparaît comme un point faible récurrent, avec un profit nettement inférieur aux autres régions.
+
+Enfin, les clients récurrents représentent un levier majeur de valeur, 
+mais la proportion de clients à achat unique reste élevée, ce qui limite la croissance de la marge à long terme.
+""")
+
+# === RECOMMANDATIONS STRATÉGIQUES ===
+st.header("🎯 Recommandations Stratégiques")
+
+st.subheader("1. Optimiser la politique de remises")
+st.write("""
+Les remises supérieures à 20 % entraînent une chute significative du profit. 
+Une politique de remise plus contrôlée, notamment sur les produits sensibles, permettrait d’améliorer la marge globale.
+""")
+
+st.subheader("2. Revoir le mix produit")
+st.write("""
+Certains produits génèrent du chiffre d’affaires mais détruisent du profit. 
+Une analyse plus fine du catalogue permettrait de retirer ou repositionner les références les moins rentables.
+""")
+
+st.subheader("3. Renforcer la stratégie régionale")
+st.write("""
+La région West sous-performe nettement. 
+Un ajustement des prix, une optimisation logistique ou une réduction des remises pourraient améliorer la rentabilité locale.
+""")
+
+st.subheader("4. Investir dans la fidélisation client")
+st.write("""
+Les clients récurrents génèrent une valeur plus stable et plus rentable. 
+Mettre en place des programmes de fidélité ou des offres personnalisées augmenterait la valeur client à long terme.
+""")
+
+st.subheader("5. Capitaliser sur les catégories à forte marge")
+st.write("""
+Technology et Office Supplies sont les moteurs de la rentabilité. 
+Renforcer ces gammes, améliorer leur visibilité et optimiser les stocks peut accélérer la croissance.
+""")
+
+
+
 # === FOOTER ===
 st.divider()
 st.markdown("---")
