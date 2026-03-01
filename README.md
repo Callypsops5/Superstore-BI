@@ -217,6 +217,79 @@ curl "http://localhost:8000/kpi/clients?limite=10"
 
 ---
 
+📖 Data Storytelling : Ce que révèlent les données
+🎯 Message principal
+Le dataset Superstore montre un chiffre d’affaires solide (~2,29 M€) sur 2015–2018, avec 5 009 commandes et 793 clients.
+Cependant, la rentabilité est très inégale selon les catégories, les régions et les périodes.
+
+💪 Forces observées
+Technology domine largement :
+
+CA le plus élevé (~836 k€)
+
+Profit massif (~145 k€)
+
+Marge excellente (17,4 %)
+
+Produits phares : Canon imageCLASS 2200, HP LaserJet, etc.
+
+Office Supplies reste très rentable (marge 17,04 %, profit ~122 k€).
+
+Fidélité clients exceptionnelle :
+
+98,5 % de clients récurrents
+
+6,32 commandes par client en moyenne
+
+⚠️ Faiblesses critiques
+Furniture est le principal problème :
+
+CA élevé (~742 k€)
+
+Profit très faible (~18,5 k€)
+
+Marge catastrophique (2,49 %)
+
+Plusieurs produits vendus à perte
+
+Région Central sous-performe fortement :
+
+CA le plus faible (~502 k€)
+
+Profit souvent proche de zéro ou négatif sur Furniture
+
+Saisonnalité marquée :
+
+Pics en fin d’année
+
+Plusieurs mois avec profit négatif malgré un CA positif
+
+Indice de remises trop agressives ou coûts mal maîtrisés
+
+🚀 Opportunités business
+Renforcer Technology : stock, marketing, bundles (ex. copieurs + fournitures).
+
+Réduire les remises sur Furniture : limiter à 10–15 % pour éviter les ventes à perte.
+
+Capitaliser sur West & East : régions les plus dynamiques.
+
+Cibler Corporate & Home Office : segments plus rentables que Consumer.
+
+Valoriser les top clients (ex. Sean Miller, Tamara Chand) via offres personnalisées.
+
+📅 Analyse temporelle
+Forte croissance du CA en fin d’année (Q4).
+
+Profit très volatil : plusieurs creux négatifs.
+
+Recommandation :
+
+anticiper les pics (pré‑stock Technology)
+
+éviter les remises destructrices en inter‑saison
+
+---
+
 ## 🎓 Exercices pour les élèves
 
 ### **Atelier 1 - KPI de base** (30 min)
