@@ -526,3 +526,52 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
+
+st.markdown("---")
+st.header("📖 Data Storytelling : Ce que les chiffres nous racontent")
+
+with st.expander("Message principal – Un CA solide mais une rentabilité très inégale", expanded=True):
+    st.markdown(f"""
+    **Chiffre d'affaires global : ~2 297 200 €** sur la période 2015-2018, avec **5 009 commandes** et **793 clients**.  
+    **Profit total : ~286 397 €** → marge moyenne **12,47 %** → acceptable mais fragile.
+
+    **Forces observées** :
+    - **Technology** domine clairement : CA le plus élevé (~836 k€ dans le tableau catégories), profit massif (~145 k€), marge excellente **17,4 %**.
+      Produits phares comme **Canon imageCLASS 2200 Advanced Copier** (CA 61,6 k€ + profit 25,2 k€) ou **HP LaserJet** tirent l'activité vers le haut.
+    - **Office Supplies** reste rentable (marge **17,04 %**, profit ~122 k€) malgré un CA légèrement inférieur.
+    - Fidélité clients très forte : **98,5 %** de clients récurrents, **6,32 commandes par client** en moyenne.
+
+    **Faiblesses / points d'attention critiques** :
+    - **Furniture** est le gros problème : CA important (~742 k€) mais profit ridicule **~18,5 k€ seulement** → marge **2,49 %** (la plus basse de loin).
+      Certains meubles (ex. HON Task Chairs) génèrent du CA sans profit net, et d'autres tirent la marge vers le bas.
+    - **Région Central** sous-performe nettement : CA le plus faible (~502 k€), profit très impacté (souvent proche de zéro ou négatif sur Furniture).
+    - Évolution temporelle : pics saisonniers marqués (fin d'année / Q4), mais plusieurs mois avec **profit négatif** malgré CA positif → signe de remises ou coûts mal maîtrisés.
+    """)
+
+    st.warning("⚠️ Risque majeur : Sans correction sur Furniture et Central, la marge globale risque de continuer à fondre malgré la croissance du CA.")
+
+with st.expander("Opportunités business identifiées", expanded=False):
+    st.markdown("""
+    - **Booster Technology** : catégorie la plus rentable → investir en stock, marketing ciblé, bundles (ex. associer copieurs Canon + accessoires Office Supplies).
+    - **Réduire la pression remises sur Furniture** : limiter à 10-15 % max pour éviter les ventes à perte. Potentiel gain marge rapide.
+    - **Région West & East** : déjà leaders (CA 678-725 k€) → consolider avec offres Corporate (segment plus rentable par commande).
+    - **Segment Corporate & Home Office** : meilleur ratio profit/CA que Consumer → campagnes B2B ciblées pour augmenter leur part.
+    - **Top clients** (Sean Miller, Tamara Chand, etc.) : les chouchouter avec offres personnalisées pour maximiser la récurrence déjà élevée.
+    """)
+
+    st.success("✅ Opportunité n°1 : Réallouer 20-30 % du budget promo de Furniture vers Technology → impact marge potentiel +3 à 5 % en 12 mois.")
+
+with st.expander("Évolution temporelle – Saisonnalité et alertes", expanded=False):
+    st.markdown("""
+    Les graphiques montrent une croissance globale du CA, avec des **pics très forts fin d'année** (souvent >20-30 k€/jour en Q4).  
+    Mais le profit est beaucoup plus volatile : plusieurs creux négatifs même quand le CA reste positif.
+
+    **Explication probable** : remises agressives en période creuse + coûts fixes/logistiques qui ne suivent pas.  
+    **Action recommandée** : anticiper les pics (pré-stock Technology) et éviter les promos destructrices en inter-saison.
+    """)
+
+
+
+    # Pour rendre le story stelling dynamique , il faut integrer de l' IA (prumpt) avec l'API groq
+
