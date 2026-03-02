@@ -606,10 +606,20 @@ with tab_comp1:
     st.write("💡 Comparer deux années permet d'identifier si la croissance est réelle ou si elle masque une dégradation de la rentabilité.")
 
     col_annee1, col_annee2 = st.columns(2)
+    annees_disponibles = sorted(valeurs_filtres.get('annees', []))
+
     with col_annee1:
-        annee_ref = st.selectbox("📅 Année de référence", [2021, 2022, 2023], index=0)
+        annee_ref = st.selectbox(
+            "📅 Année de référence",
+            options=annees_disponibles,
+            index=0
+        )
     with col_annee2:
-        annee_comp = st.selectbox("📅 Année de comparaison", [2022, 2023, 2024], index=1)
+        annee_comp = st.selectbox(
+            "📅 Année de comparaison",
+            options=annees_disponibles,
+            index=len(annees_disponibles) - 1
+        )
 
     comp_params = {'annee_reference': annee_ref, 'annee_comparaison': annee_comp}
     if categorie != "Toutes":

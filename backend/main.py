@@ -627,19 +627,18 @@ def get_tendance_rentabilite(
 
 @app.get("/filters/valeurs", tags=["Filtres"])
 def get_valeurs_filtres():
-    """🎯 Valeurs disponibles pour les filtres"""
     df = get_dataframe()
     return {
         "categories": sorted(df['category'].unique().tolist()),
         "regions": sorted(df['region'].unique().tolist()),
         "segments": sorted(df['segment'].unique().tolist()),
         "etats": sorted(df['state'].unique().tolist()),
+        "annees": sorted(df['order date'].dt.year.unique().tolist()),  # ADD THIS
         "plage_dates": {
             "min": df['order date'].min().strftime('%Y-%m-%d'),
             "max": df['order date'].max().strftime('%Y-%m-%d')
         }
     }
-
 
 @app.get("/data/commandes", tags=["Données brutes"])
 def get_commandes(
