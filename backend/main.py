@@ -259,6 +259,8 @@ def root():
             "evolution_temporelle": "/kpi/temporel",
             "performance_geo": "/kpi/geographique",
             "analyse_clients": "/kpi/clients",
+            
+            # Endpoints ajoutés pour la rentabilité et l'analyse approfondie
             "rentabilite_globale": "/kpi/rentabilite/globale",
             "produits_perte": "/kpi/rentabilite/pertes",
             "impact_remises": "/kpi/rentabilite/remises",

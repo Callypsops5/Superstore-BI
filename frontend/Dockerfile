@@ -1,21 +1,13 @@
-# frontend/Dockerfile
 FROM python:3.11-slim
 
 WORKDIR /app
 
-# Installation avec curl pour healthcheck
 RUN apt-get update && apt-get install -y \
-    gcc \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
-
-RUN pip install --no-cache-dir \
-    streamlit==1.30.0 \
-    plotly==5.18.0 \
-    requests==2.31.0 \
-    pandas==2.1.4
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY dashboard.py .
 
