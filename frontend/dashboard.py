@@ -461,12 +461,6 @@ fig_segments.update_layout(
 )
 st.plotly_chart(fig_segments, use_container_width=True)
 
-"""
-SECTIONS À AJOUTER dans app.py
-Coller ces sections APRÈS la section "Analyse Clients" existante
-et AVANT la "Synthèse Finale"
-"""
-
 # ================================================================
 # SECTION 4 : RENTABILITÉ (new)
 # ================================================================
