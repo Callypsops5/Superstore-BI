@@ -461,6 +461,369 @@ fig_segments.update_layout(
 )
 st.plotly_chart(fig_segments, use_container_width=True)
 
+# ================================================================
+# SECTION 4 : RENTABILITÉ (new)
+# ================================================================
+st.divider()
+st.header("💰 Analyse de Rentabilité")
+
+st.write("💡 La rentabilité va au-delà du chiffre d'affaires. Cette section identifie les produits qui détruisent la marge et l'impact réel des remises.")
+
+tab_rent1, tab_rent2, tab_rent3 = st.tabs(["📊 Vue Globale", "⚠️ Produits en Perte", "📉 Impact Remises"])
+
+# --- TAB : RENTABILITÉ GLOBALE ---
+with tab_rent1:
+    rentabilite = appeler_api("/kpi/rentabilite/globale", params=params_filtres)
+    
+    col_r1, col_r2, col_r3 = st.columns(3)
+    with col_r1:
+        couleur = "normal" if rentabilite['est_sante'] else "inverse"
+        st.metric("📊 Marge Globale", formater_pourcentage(rentabilite['marge_globale']))
+    with col_r2:
+        st.metric("💵 Profit Total", formater_euro(rentabilite['profit_total']))
+    with col_r3:
+        statut = "✅ Saine" if rentabilite['est_sante'] else "⚠️ Fragile"
+        st.metric("🏥 Santé financière", statut)
+
+    # Message storytelling de l'API
+    if rentabilite['est_sante']:
+        st.success(rentabilite['message'])
+    else:
+        st.warning(rentabilite['message'])
+
+    # Rentabilité par catégorie
+    st.subheader("Marge par Catégorie")
+    rent_cat = appeler_api("/kpi/rentabilite/categories", params=params_filtres)
+    df_rent_cat = pd.DataFrame(rent_cat)
+
+    fig_rent_cat = px.bar(
+        df_rent_cat,
+        x='categorie',
+        y='marge_pct',
+        color='marge_pct',
+        color_continuous_scale='RdYlGn',
+        title="Marge (%) par Catégorie — vert = rentable, rouge = fragile",
+        labels={'categorie': 'Catégorie', 'marge_pct': 'Marge (%)'},
+        text='marge_pct',
+        height=400
+    )
+    fig_rent_cat.update_traces(texttemplate='%{text:.1f}%', textposition='outside')
+    fig_rent_cat.add_hline(y=12, line_dash="dash", line_color="red",
+                        annotation_text="Seuil recommandé 12%")
+    st.plotly_chart(fig_rent_cat, use_container_width=True)
+
+    # Tendance de marge dans le temps
+    st.subheader("📈 Tendance de la Marge")
+    tendance = appeler_api("/kpi/rentabilite/tendance", params=params_filtres)
+    df_tendance = pd.DataFrame(tendance)
+
+    fig_tendance = px.line(
+        df_tendance,
+        x='periode',
+        y='marge_pct',
+        title="Évolution de la marge mensuelle (%)",
+        labels={'periode': 'Période', 'marge_pct': 'Marge (%)'},
+        markers=True,
+        height=350
+    )
+    fig_tendance.add_hline(y=12, line_dash="dash", line_color="red",
+                        annotation_text="Seuil 12%")
+    fig_tendance.update_traces(line=dict(color='#667eea', width=3))
+    st.plotly_chart(fig_tendance, use_container_width=True)
+
+# --- TAB : PRODUITS EN PERTE ---
+with tab_rent2:
+    st.write("⚠️ Ces produits génèrent du CA mais **détruisent de la marge**. Chaque vente de ces produits coûte de l'argent à l'entreprise.")
+
+    pertes = appeler_api("/kpi/rentabilite/pertes", params={
+        'limite': 10,
+        **{k: v for k, v in params_filtres.items() if k in ['date_debut', 'date_fin', 'categorie', 'region']}
+    })
+
+    if pertes:
+        df_pertes = pd.DataFrame(pertes)
+
+        fig_pertes = px.bar(
+            df_pertes,
+            x='perte_montant',
+            y='produit',
+            color='categorie',
+            orientation='h',
+            title="Top 10 Produits en Perte (montant de perte en €)",
+            labels={'perte_montant': 'Perte (€)', 'produit': 'Produit'},
+            color_discrete_sequence=px.colors.qualitative.Set1,
+            height=450
+        )
+        fig_pertes.update_layout(yaxis={'categoryorder': 'total ascending'})
+        st.plotly_chart(fig_pertes, use_container_width=True)
+
+        perte_totale = df_pertes['perte_montant'].sum()
+        st.error(f"💸 Ces {len(df_pertes)} produits génèrent **{formater_euro(abs(perte_totale))}** de pertes cumulées.")
+    else:
+        st.success("✅ Aucun produit en perte détecté sur cette période !")
+
+# --- TAB : IMPACT REMISES ---
+with tab_rent3:
+    st.write("📉 Cette analyse montre comment les remises élevées **font chuter le profit moyen par transaction**.")
+
+    remises = appeler_api("/kpi/rentabilite/remises", params={
+        k: v for k, v in params_filtres.items()
+        if k in ['date_debut', 'date_fin', 'categorie']
+    })
+    df_remises = pd.DataFrame(remises)
+
+    fig_remises = px.bar(
+        df_remises,
+        x='remise',
+        y='profit_moyen',
+        title="Profit moyen selon le taux de remise",
+        labels={'remise': 'Taux de remise', 'profit_moyen': 'Profit moyen (€)'},
+        color='profit_moyen',
+        color_continuous_scale='RdYlGn',
+        text='profit_moyen',
+        height=400
+    )
+    fig_remises.update_traces(texttemplate='%{text:.1f}€', textposition='outside')
+    fig_remises.add_hline(y=0, line_color="red", line_width=2)
+    st.plotly_chart(fig_remises, use_container_width=True)
+
+    # Calcul du seuil où le profit devient négatif
+    seuil_negatif = df_remises[df_remises['profit_moyen'] < 0]
+    if not seuil_negatif.empty:
+        premier_seuil = seuil_negatif.iloc[0]['remise']
+        st.warning(f"⚠️ À partir de **{premier_seuil*100:.0f}% de remise**, le profit moyen devient négatif.")
+
+# ================================================================
+# SECTION 5 : COMPARAISONS TEMPORELLES (new)
+# ================================================================
+st.divider()
+st.header("📅 Comparaisons & Saisonnalité")
+
+tab_comp1, tab_comp2, tab_comp3 = st.tabs(["📊 Année sur Année", "📅 Saisonnalité", "📉 Produits en Déclin"])
+
+# --- TAB : COMPARAISON ANNUELLE ---
+with tab_comp1:
+    st.write("💡 Comparer deux années permet d'identifier si la croissance est réelle ou si elle masque une dégradation de la rentabilité.")
+
+    col_annee1, col_annee2 = st.columns(2)
+    annees_disponibles = sorted(valeurs_filtres.get('annees', []))
+
+    with col_annee1:
+        annee_ref = st.selectbox(
+            "📅 Année de référence",
+            options=annees_disponibles,
+            index=0
+        )
+    with col_annee2:
+        annee_comp = st.selectbox(
+            "📅 Année de comparaison",
+            options=annees_disponibles,
+            index=len(annees_disponibles) - 1
+        )
+
+    comp_params = {'annee_reference': annee_ref, 'annee_comparaison': annee_comp}
+    if categorie != "Toutes":
+        comp_params['categorie'] = categorie
+    if region != "Toutes":
+        comp_params['region'] = region
+
+    comparaison = appeler_api("/kpi/comparaison/annuel", params=comp_params)
+
+    # Affichage des variations
+    col_v1, col_v2, col_v3 = st.columns(3)
+    with col_v1:
+        st.metric(
+            "💰 CA",
+            formater_euro(comparaison['ca_comparaison']),
+            delta=f"{comparaison['variation_ca_pct']:+.1f}%",
+            help=f"Référence: {formater_euro(comparaison['ca_reference'])}"
+        )
+    with col_v2:
+        st.metric(
+            "💵 Profit",
+            formater_euro(comparaison['profit_comparaison']),
+            delta=f"{comparaison['variation_profit_pct']:+.1f}%",
+            help=f"Référence: {formater_euro(comparaison['profit_reference'])}"
+        )
+    with col_v3:
+        st.metric(
+            "🧾 Commandes",
+            formater_nombre(comparaison['commandes_comparaison']),
+            delta=f"{comparaison['variation_commandes_pct']:+.1f}%",
+            help=f"Référence: {formater_nombre(comparaison['commandes_reference'])}"
+        )
+
+    # Message storytelling de l'API
+    if comparaison['variation_ca_pct'] > 0:
+        st.success(comparaison['message'])
+    else:
+        st.warning(comparaison['message'])
+
+    # Graphique comparatif
+    df_comp_viz = pd.DataFrame({
+        'Métrique': ['CA', 'Profit', 'Commandes'],
+        str(annee_ref): [
+            comparaison['ca_reference'],
+            comparaison['profit_reference'],
+            comparaison['commandes_reference']
+        ],
+        str(annee_comp): [
+            comparaison['ca_comparaison'],
+            comparaison['profit_comparaison'],
+            comparaison['commandes_comparaison']
+        ]
+    })
+
+    fig_comp = go.Figure()
+    fig_comp.add_trace(go.Bar(
+        name=str(annee_ref),
+        x=df_comp_viz['Métrique'],
+        y=df_comp_viz[str(annee_ref)],
+        marker_color='#667eea'
+    ))
+    fig_comp.add_trace(go.Bar(
+        name=str(annee_comp),
+        x=df_comp_viz['Métrique'],
+        y=df_comp_viz[str(annee_comp)],
+        marker_color='#764ba2'
+    ))
+    fig_comp.update_layout(
+        title=f"Comparaison {annee_ref} vs {annee_comp}",
+        barmode='group',
+        height=400
+    )
+    st.plotly_chart(fig_comp, use_container_width=True)
+
+# --- TAB : SAISONNALITÉ ---
+with tab_comp2:
+    st.write("💡 La saisonnalité révèle les périodes de pic et de creux. Anticiper ces cycles permet d'optimiser les stocks et les promotions.")
+
+    saison_params = {}
+    if categorie != "Toutes":
+        saison_params['categorie'] = categorie
+
+    saisonnalite = appeler_api("/kpi/saisonnalite", params=saison_params)
+    df_saison = pd.DataFrame(saisonnalite['saisonnalite'])
+
+    fig_saison = make_subplots(rows=1, cols=2,
+                               subplot_titles=("CA par mois", "Profit par mois"))
+
+    fig_saison.add_trace(
+        go.Bar(
+            x=df_saison['mois_nom'],
+            y=df_saison['ca'],
+            marker_color='#667eea',
+            name='CA'
+        ), row=1, col=1
+    )
+
+    fig_saison.add_trace(
+        go.Bar(
+            x=df_saison['mois_nom'],
+            y=df_saison['profit'],
+            marker_color='#2ecc71',
+            name='Profit'
+        ), row=1, col=2
+    )
+
+    fig_saison.update_layout(height=400, showlegend=False)
+    st.plotly_chart(fig_saison, use_container_width=True)
+
+    # Insights saisonnalité
+    insights = saisonnalite['insights']
+    col_s1, col_s2, col_s3 = st.columns(3)
+    with col_s1:
+        st.metric("🏆 Meilleur mois", insights['meilleur_mois'])
+    with col_s2:
+        st.metric("📉 Mois le plus faible", insights['pire_mois'])
+    with col_s3:
+        st.metric("📊 Écart max/min", f"{insights['variation_max_min_pct']:.0f}%")
+
+    st.info(saisonnalite['message'])
+
+# --- TAB : PRODUITS EN DÉCLIN ---
+with tab_comp3:
+    st.write("📉 Identifier les produits qui perdent des ventes permet d'agir avant qu'ils deviennent des produits en perte.")
+
+    col_d1, col_d2 = st.columns(2)
+    with col_d1:
+        periode_ref_declin = st.text_input("Période de référence (YYYY-MM)", value="2022-01")
+    with col_d2:
+        periode_comp_declin = st.text_input("Période de comparaison (YYYY-MM)", value="2023-01")
+
+    declin = appeler_api("/kpi/produits/declin", params={
+        'limite': 10,
+        'periode_reference': periode_ref_declin,
+        'periode_comparaison': periode_comp_declin
+    })
+
+    if declin['produits']:
+        df_declin = pd.DataFrame(declin['produits'])
+
+        fig_declin = px.bar(
+            df_declin,
+            x='variation_pct',
+            y='produit',
+            orientation='h',
+            color='categorie',
+            title="Produits en déclin (variation des ventes %)",
+            labels={'variation_pct': 'Variation (%)', 'produit': 'Produit'},
+            height=450
+        )
+        fig_declin.update_layout(yaxis={'categoryorder': 'total ascending'})
+        st.plotly_chart(fig_declin, use_container_width=True)
+        st.warning(declin['message'])
+    else:
+        st.success(declin['message'])
+
+# ================================================================
+# SECTION 6 : RÉSUMÉ EXÉCUTIF (new)
+# ================================================================
+st.divider()
+st.header("📋 Résumé Exécutif")
+
+st.write("Vue consolidée pour les décideurs — tous les indicateurs clés en un seul endroit.")
+
+resume_params = {
+    'date_debut': params_filtres.get('date_debut'),
+    'date_fin': params_filtres.get('date_fin')
+}
+
+resume = appeler_api("/kpi/dashboard/resume", params=resume_params)
+
+# Performance globale
+perf = resume['performance_globale']
+col_e1, col_e2, col_e3 = st.columns(3)
+with col_e1:
+    st.metric("💰 CA Total", formater_euro(perf['ca_total']))
+    st.metric("🛒 Panier moyen", formater_euro(perf['panier_moyen']))
+with col_e2:
+    st.metric("💵 Profit Total", formater_euro(perf['profit_total']))
+    st.metric("📈 Marge Globale", formater_pourcentage(perf['marge_globale_pct']))
+with col_e3:
+    st.metric("🧾 Commandes", formater_nombre(perf['nb_commandes']))
+    st.metric("👥 Clients", formater_nombre(perf['nb_clients']))
+
+# Catégories : meilleure vs à améliorer
+col_cat1, col_cat2 = st.columns(2)
+with col_cat1:
+    st.success(f"✅ **Meilleure catégorie** : {resume['categories']['meilleure']['nom']} — {resume['categories']['meilleure']['marge_pct']}% de marge")
+with col_cat2:
+    st.warning(f"⚠️ **À améliorer** : {resume['categories']['a_ameliorer']['nom']} — {resume['categories']['a_ameliorer']['marge_pct']}% de marge")
+
+# Alertes
+alertes = resume['alertes']
+if alertes['produits_en_perte'] > 0:
+    st.error(f"🚨 **{alertes['produits_en_perte']} produits en perte** représentant {formater_euro(abs(alertes['montant_pertes']))} de pertes.")
+
+# Message narratif de l'API
+st.info(resume['message'])
+
+# Recommandations de l'API
+st.subheader("🎯 Recommandations")
+for i, reco in enumerate(resume['recommandations'], 1):
+    st.write(f"**{i}.** {reco}")
+
 # === SYNTHÈSE FINALE ===
 st.divider()
 st.header("🧠 Synthèse Finale")

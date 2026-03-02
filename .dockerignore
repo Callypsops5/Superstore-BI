@@ -1,37 +1,54 @@
+# ======================
 # Python
+# ======================
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
-env/
 venv/
+env/
 ENV/
 *.egg-info/
 dist/
 build/
 
-# IDE
+# ======================
+# Git
+# ======================
+.git/
+.gitignore
+
+# ======================
+# IDE / Editor
+# ======================
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# Git
-.git/
-.gitignore
-
-# Tests
+# ======================
+# Tests & Coverage
+# ======================
 tests/
-pytest_cache/
+.pytest_cache/
 .coverage
+coverage.xml
 htmlcov/
 
-# Documentation
-README.md
-docs/
+# ======================
+# Environment variables
+# ======================
+.env
+*.env
 
-# Docker
-Dockerfile
-docker-compose.yml
-.dockerignore
+# ======================
+# OS files
+# ======================
+.DS_Store
+Thumbs.db
+
+# ======================
+# Documentation
+# ======================
+docs/

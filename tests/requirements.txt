@@ -1,0 +1,5 @@
+# Tests uniquement - ne pas inclure dans les Dockerfiles
+pytest==7.4.3
+pytest-cov==4.1.0
+httpx==0.26.0  # Pour tester FastAPI
+pandas # Pour les tests de manipulation de données
